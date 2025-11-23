@@ -1,14 +1,15 @@
-# Basketball Shot Chart Analysis
+# Basketball Game Statistics Analysis System
 
-This project creates a confusion-matrix-style shot chart visualization that displays points per shot (PPS) and points per possession (PPP) for different zones on the basketball court.
+A comprehensive analysis framework for basketball game statistics that calculates efficiency metrics, analyzes turnovers, evaluates rebounding, optimizes shot selection, and generates detailed coaching reports.
 
 ## Features
 
-- Divides the basketball court into a grid (default: 5x5 zones)
-- Calculates points per shot for each zone
-- Calculates points per possession for each zone
-- Creates heatmap visualizations similar to a confusion matrix
-- Displays shot counts in each zone
+- **Efficiency Metrics**: Calculates points per possession (PPP) and points per shot (PPS)
+- **Turnover Analysis**: Identifies turnover trends, potential points lost, and reduction strategies
+- **Rebounding Analysis**: Evaluates offensive/defensive rebounding performance and opponent rebounding ability
+- **Shot Selection Optimization**: Determines optimal 2PT vs 3PT shot mix based on expected values
+- **Possession Tracking**: Accurately calculates and tracks possessions
+- **Comprehensive Coach Reports**: Generates detailed PDF reports with actionable insights
 
 ## Setup
 
@@ -23,70 +24,128 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-2. Prepare your shot data CSV file with the following columns:
-   - `GameClock`: Time on the game clock
-   - `Quarter`: Quarter number
-   - `Player`: Player name
-   - `Team`: Team name
-   - `ShotType`: Type of shot (e.g., "Jump Shot", "3PT Shot", "Layup", "Dunk")
-   - `Result`: "Made" or "Miss"
-   - `X`: X coordinate of the shot (0-94 feet, court width)
-   - `Y`: Y coordinate of the shot (0-50 feet, court length)
-   - `AssistBy`: Player who assisted (or "N/A")
-   - `Distance`: Distance of the shot
+## Data Format
 
-3. Name your CSV file `shots_data.csv` or modify `main.py` to use a different filename.
+The system requires two CSV files:
+
+### 1. Team Box Score CSV
+Should contain columns including:
+- `Team`: Team name (e.g., "Harker", "Aptos")
+- `Points`: Total points scored
+- `FG Made`, `FG Attempts`, `FG%`: Field goal statistics
+- `2FG Made`, `2FG Attempts`, `2FG%`: Two-point field goals
+- `3FG Made`, `3FG Att`, `3FG%`: Three-point field goals
+- `Offensive Rebounds`, `Defensive Rebounds`, `Rebounds`: Rebounding stats
+- `Assists`, `Turnovers`, `Fouls`: Other statistics
+- `True Shooting%`, `Effective Field Goal%`: Advanced metrics
+- `Points Per Possession`: Points per possession (if available)
+
+### 2. Player Statistics CSV
+Should contain columns including:
+- `Team`: "home" for our team, or team identifier
+- `Athlete`: Player name
+- `#`: Player number
+- `Basic:MP`: Minutes played (MM:SS format)
+- `Basic:PTS`, `Basic:FGM`, `Basic:FGA`, `Basic:FG%`: Basic shooting stats
+- `Basic:3FGM`, `Basic:3FGA`, `Basic:3FG%`: Three-point shooting
+- `Basic:ORB`, `Basic:DRB`, `Basic:TRB`: Rebounding stats
+- `Basic:AST`, `Basic:STL`, `Basic:BLK`, `Basic:TO`: Other stats
+- `Advanced:USG%`, `Advanced:ORB%`, `Advanced:DRB%`: Advanced metrics
+- `Shooting:TS%`, `Shooting:eFG%`: Shooting efficiency metrics
 
 ## Usage
 
-Run the main script (make sure virtual environment is activated):
+Run the analysis script with your CSV files:
+
 ```bash
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-python main.py
+source venv/bin/activate
+python analyze_game_stats.py [team_box_score.csv] [player_stats.csv]
 ```
 
-Or use the convenience script:
+If no arguments are provided, it will look for files in your Downloads folder with default names.
+
+Example:
 ```bash
-./run.sh
+python analyze_game_stats.py "2025-10-21 Harker vs Aptos -team-box-score.csv" "2025-10-21 Harker vs Aptos stats.csv"
 ```
-
-The script will:
-1. Load your shot data
-2. Calculate statistics for each zone
-3. Generate multiple visualization files:
-   - `shot_chart_comparison.png`: Side-by-side comparison of PPS and PPP
-   - `shot_chart_combined.png`: Combined chart showing both metrics
-   - `shot_chart_pps.png`: Points per shot only
-   - `shot_chart_ppp.png`: Points per possession only
-4. Save zone statistics to `zone_statistics.csv`
-
-## Customization
-
-You can adjust the grid size by modifying the `grid_rows` and `grid_cols` parameters in `main.py`:
-
-```python
-grid_rows = 5  # Number of zones along court length
-grid_cols = 5  # Number of zones along court width
-```
-
-You can also adjust court dimensions in `process_shots.py` if your coordinate system differs:
-- `court_width`: Default 94 feet
-- `court_length`: Default 50 feet
-
-## Sample Data
-
-A sample dataset (`sample_shots_data.csv`) is included for testing. You can rename it to `shots_data.csv` to use it.
 
 ## Output
 
-The visualizations show:
-- Color intensity: Higher values are shown in blue/green, lower values in red
-- Text annotations: Each cell displays the metric value and number of shots
-- Grid layout: Similar to a confusion matrix, with zones labeled
+The script generates:
 
-## Notes
+1. **Console Output**: Real-time analysis results showing:
+   - Efficiency metrics comparison
+   - Turnover analysis
+   - Rebounding statistics
+   - Shot selection recommendations
 
-- Each shot is treated as a possession for PPP calculation
-- 3PT shots are worth 3 points when made, all other made shots are worth 2 points
-- Zones with no shots are displayed in gray with "No Shots" text
+2. **gamma_report_prompt.txt**: Detailed, formatted prompt for Gamma.app including:
+   - Executive summary with key metrics
+   - Comprehensive efficiency analysis
+   - Turnover analysis and reduction strategies
+   - Rebounding analysis and opponent assessment
+   - Shot selection optimization recommendations
+   - Player performance highlights
+   - Action items and next steps
+   - Visualization recommendations for charts/graphs
+   
+   **How to use:**
+   - Copy the content from `gamma_report_prompt.txt`
+   - Go to [Gamma.app](https://gamma.app)
+   - Create a new presentation
+   - Paste the content to generate a beautiful, interactive graphical report
 
+3. **game_summary.txt**: Quick text summary for easy reference
+
+## Customization
+
+You can customize the team names in `analyze_game_stats.py`:
+
+```python
+analyzer = GameAnalyzer(
+    team_box_score_path=team_box_score_path,
+    player_stats_path=player_stats_path,
+    our_team="Harker",      # Change to your team name
+    opponent_team="Aptos"   # Change to opponent team name
+)
+```
+
+## Key Metrics Explained
+
+- **Points Per Possession (PPP)**: Average points scored per possession. Higher is better.
+- **Points Per Shot (PPS)**: Average points per shot attempt. Higher is better.
+- **Expected Value**: Statistical expected points for shot types (2PT vs 3PT)
+- **Turnover Rate**: Percentage of possessions ending in turnovers. Lower is better.
+- **Rebounding Percentage**: Percentage of available rebounds captured. Higher is better.
+
+## Analysis Features
+
+### Turnover Reduction System
+- Identifies high-risk players and situations
+- Calculates potential points lost from turnovers
+- Provides specific reduction strategies
+- Tracks assist-to-turnover ratios
+
+### Rebounding Intelligence
+- Analyzes offensive rebounding opportunities
+- Evaluates opponent rebounding strengths/weaknesses
+- Identifies second-chance opportunities
+- Provides positioning recommendations
+
+### Shot Selection Optimization
+- Compares expected values of 2PT vs 3PT shots
+- Recommends optimal shot mix
+- Identifies inefficient shot patterns
+- Analyzes player-level shooting efficiency
+
+## Requirements
+
+- Python 3.7+
+- pandas
+- numpy
+- matplotlib
+- seaborn
+
+## License
+
+This project is for coaching and analysis purposes.
