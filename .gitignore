@@ -43,12 +43,15 @@ wheels/
 ehthumbs.db
 Thumbs.db
 
-# Project specific
+# Project specific - Generated output files
 *.png
 *.jpg
 *.jpeg
 zone_statistics.csv
+gamma_report_prompt.txt
+game_summary.txt
+*.pdf
 
-# Keep sample data but ignore actual data
-!sample_shots_data.csv
+# Generated reports
+coach_report.pdf
 
